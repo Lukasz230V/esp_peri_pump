@@ -58,6 +58,20 @@
     var ledCharacteristic = '000000ff-0000-1000-8000-00805f9b34fb';
     var sensorCharacteristic= '19b10001-e8f2-537e-4f6c-d104768a1214';
 
+
+    document.getElementById('connectBtn').addEventListener('click', async () => {
+   
+
+const device = await navigator.bluetooth.requestDevice({
+  acceptAllDevices: true  // Akceptuj wszystkie urządzenia
+});
+console.log('Urządzenie wykryte:', device.name);
+
+
+
+
+
+    
     //Global Variables to Handle Bluetooth
     var bleServer;
     var bleServiceFound;
