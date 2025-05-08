@@ -8,38 +8,56 @@
 </head>
 <body>
   <h1>Sterowanie ESP32 przez BLE</h1>
-  <button id="connect">Połącz z ESP32</button>
-  <div>
+  <div class="buttons">
+    <button id="connect">Połącz z ESP32</button>
+    <button id="disconnect" disabled>Rozłącz</button>
+  </div>
+
+  <div class="commands">
     <button class="command" data-cmd="LIGHT ON" disabled>Włącz światło</button>
     <button class="command" data-cmd="LIGHT OFF" disabled>Wyłącz światło</button>
     <button class="command" data-cmd="FAN ON" disabled>Włącz wentylator</button>
     <button class="command" data-cmd="FAN OFF" disabled>Wyłącz wentylator</button>
+
   </div>
   <div id="status">Niepołączony</div>
+
 
   <script>
     const SERVICE_UUID = 0xee00;
     const WRITE_UUID = 0xff01;
     let writeChar = null;
+    let device = null;
+    let server = null;
 
     async function connectToESP32() {
       try {
         document.getElementById('status').textContent = 'Łączenie z urządzeniem...';
 
-        const device = await navigator.bluetooth.requestDevice({
+        device = await navigator.bluetooth.requestDevice({
           acceptAllDevices: true,
           optionalServices: [SERVICE_UUID]
         });
 
-        const server = await device.gatt.connect();
+        server = await device.gatt.connect();
         const service = await server.getPrimaryService(SERVICE_UUID);
         writeChar = await service.getCharacteristic(WRITE_UUID);
 
         document.querySelectorAll('.command').forEach(btn => btn.disabled = false);
+        document.getElementById('disconnect').disabled = false;
         document.getElementById('status').textContent = `Połączono z ${device.name || 'ESP32'}`;
       } catch (err) {
         document.getElementById('status').textContent = 'Błąd połączenia: ' + err;
         console.error(err);
+      }
+    }
+
+    function disconnectESP32() {
+      if (device && device.gatt.connected) {
+        device.gatt.disconnect();
+        document.getElementById('status').textContent = 'Rozłączono';
+        document.querySelectorAll('.command').forEach(btn => btn.disabled = true);
+        document.getElementById('disconnect').disabled = true;
       }
     }
 
@@ -51,9 +69,12 @@
     }
 
     document.getElementById('connect').addEventListener('click', connectToESP32);
+    document.getElementById('disconnect').addEventListener('click', disconnectESP32);
     document.querySelectorAll('.command').forEach(btn =>
       btn.addEventListener('click', () => sendCommand(btn.dataset.cmd))
     );
   </script>
+
+
 </body>
 </html>
