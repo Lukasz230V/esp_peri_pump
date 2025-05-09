@@ -7,16 +7,25 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-height: 100vh;
 }
 
 h1 {
   margin-bottom: 1.5rem;
   font-size: 1.8rem;
+  text-align: center;
+}
+
+#controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
 button {
   padding: 1rem 1.5rem;
-  margin: 0.5rem;
   font-size: 1rem;
   border: none;
   border-radius: 8px;
@@ -32,15 +41,8 @@ button:hover:not(:disabled) {
 
 button:disabled {
   background-color: #555;
+  color: #ccc;
   cursor: not-allowed;
-}
-
-#controls {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
 }
 
 #status {
@@ -49,15 +51,16 @@ button:disabled {
   text-align: center;
 }
 
-/* Responsywność */
+/* Mobile layout */
 @media (max-width: 600px) {
   #controls {
     flex-direction: column;
-    align-items: center;
-    gap: 1rem;
+    align-items: stretch;
+    width: 100%;
   }
 
   button {
     width: 90%;
+    margin: 0 auto;
   }
 }
