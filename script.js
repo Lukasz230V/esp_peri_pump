@@ -10,11 +10,18 @@
         document.getElementById('status').textContent = 'Łączenie z urządzeniem...';
 
         if (!auto || !device) {
-          device = await navigator.bluetooth.requestDevice({
+          const savedName = localStorage.getItem('lastDeviceName');
+
+          const options = savedName ? {
+            filters: [{ name: savedName }],
+            optionalServices: [SERVICE_UUID]
+          } : {
             acceptAllDevices: true,
             optionalServices: [SERVICE_UUID]
-          });
-          localStorage.setItem('lastDeviceId', device.id);
+          };
+
+          device = await navigator.bluetooth.requestDevice(options);
+          localStorage.setItem('lastDeviceName', device.name);
         }
 
         device.addEventListener('gattserverdisconnected', () => {
@@ -60,17 +67,13 @@
 
     // Próba automatycznego połączenia po załadowaniu strony
     window.addEventListener('load', async () => {
-      try {
-        const devices = await navigator.bluetooth.getDevices();
-        for (const d of devices) {
-          if (d.name && d.gatt && !d.gatt.connected) {
-            device = d;
-            connectToESP32(true);
-            break;
-          }
+      const savedName = localStorage.getItem('lastDeviceName');
+      if (savedName) {
+        try {
+          await connectToESP32(true);
+        } catch (err) {
+          console.warn('Automatyczne połączenie nie powiodło się:', err);
         }
-      } catch (err) {
-        console.warn('Automatyczne połączenie nie powiodło się:', err);
       }
     });
   </script>
